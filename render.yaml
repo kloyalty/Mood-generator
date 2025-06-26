@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: moodspark
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn moodspark.wsgi:application"
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: moodspark.settings
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
