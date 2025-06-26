@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mood Generator</title>
+    <style>
+        body {
+            background: {{ bg_gradient }};
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            transition: background 0.5s ease;
+        }
+        
+        .mood-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 600px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .mood-badge {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: inline-block;
+            font-weight: bold;
+        }
+        
+        .quote {
+            font-size: 24px;
+            font-style: italic;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .author {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .music-player {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .music-info {
+            margin-bottom: 15px;
+        }
+        
+        .music-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .music-artist {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .music-source {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+        
+        audio {
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .refresh-btn {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            margin-top: 20px;
+        }
+        
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .no-audio {
+            color: #999;
+            font-style: italic;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="mood-container">
+        <div class="mood-badge">{{ mood }} Mood</div>
+        
+        <div class="quote">"{{ quote }}"</div>
+        <div class="author">— {{ author }}</div>
+        
+        <div class="music-player">
+            <div class="music-info">
+                <div class="music-title">🎵 {{ music.title }}</div>
+                <div class="music-artist">by {{ music.artist }}</div>
+                <div class="music-source">Source: {{ music.source }}</div>
+            </div>
+            
+            {% if music.audio_url %}
+                <audio controls autoplay loop>
+                    <source src="{{ music.audio_url }}" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            {% elif music.preview_url %}
+                <audio controls autoplay>
+                    <source src="{{ music.preview_url }}" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            {% else %}
+                <div class="no-audio">🎧 Curated music suggestion for your mood</div>
+            {% endif %}
+        </div>
+        
+        <button class="refresh-btn" onclick="window.location.reload()">
+            ✨ Generate New Mood
+        </button>
+    </div>
+    <script>
+        // Handle autoplay restrictions in modern browsers
+        document.addEventListener('DOMContentLoaded', function() {
+            const audio = document.querySelector('audio');
+            if (audio) {
+                // Try to play audio automatically
+                const playPromise = audio.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.then(_ => {
+                        console.log('Autoplay started successfully');
+                    }).catch(error => {
+                        console.log('Autoplay prevented by browser:', error);
+                        // Show a message to user that they can click to play
+                        const playButton = document.createElement('button');
+                        playButton.textContent = '🎵 Click to Play Music';
+                        playButton.style.cssText = `
+                            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+                            color: white;
+                            border: none;
+                            padding: 10px 20px;
+                            border-radius: 15px;
+                            cursor: pointer;
+                            margin-top: 10px;
+                            font-size: 14px;
+                        `;
+                        playButton.onclick = () => {
+                            audio.play();
+                            playButton.remove();
+                        };
+                        audio.parentNode.appendChild(playButton);
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>
